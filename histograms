@@ -1,0 +1,29 @@
+import pandas as pd
+df = pd.read_csv(...ereolen_voksen_2022_2023.csv, dtype='unicode')
+
+df['titel'].value_counts().head(20)
+
+df['transaktionstidspunkt'] = pd.to_datetime(df['transaktionstidspunkt'], format='%Y-%m-%d %H.%M.%S.%f')
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Bech
+df_bech = df.loc[df['navn'] == 'Glenn Bech']
+
+# Extract year and month
+df_bech['year_month'] = df['transaktionstidspunkt'].dt.to_period('W')
+
+# Count the number of transactions per month
+monthly_loans = df_bech['year_month'].value_counts().sort_index()
+
+# Plotting the histogram
+# Creating the histogram using seaborn's histplot for the 'year_month' data
+plt.figure(figsize=(12, 8))
+sns.histplot(df_bech['year_month'].dt.to_timestamp(), bins=len(monthly_loans), kde=True, color='blue')
+plt.title('Bech loans over the year 2023')
+plt.xlabel('Month')
+plt.ylabel('Number of Loans')
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.show()
