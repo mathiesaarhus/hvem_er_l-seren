@@ -1,0 +1,181 @@
+# EREOLEN PREPROCESSING
+import pandas as pd 
+df_ereolen = pd.read_csv("D:\\DATA - New Work, New Reading\\EREOLEN\\ereolen_voksen_2022.csv", dtype='unicode')
+#kun til 2023
+to_ts= '2024-01-01 00:00:00.000'
+df2022_23 = df_ereolen[(df_ereolen['transaktionstidspunkt'] < to_ts)]
+df_ereolen = dfdf2022_23
+
+#kun skønlitteratur
+#df_ereolen = df_ereolen[df_ereolen['thema'].str.startswith("F", na=False)]
+
+#tilføj 'kommune' to df
+df_ereolen['bib_id'] = df_ereolen['bib_id'].str.replace('DK-', '')
+df_bibliotekadresser = pd.read_csv("C:\\Users\\xgrsma\\Downloads\\publiclibraries.csv", sep=';')
+df_bibliotekadresser.columns = ['bib_id', 'filename',	'Adresse', 'Postnummer', 'By', 'Telefon', 'Email', 'Leder']
+df_bibliotekadresser = df_bibliotekadresser.drop(['Postnummer',	'Adresse', 'By', 'Telefon', 'Email', 'Leder'], axis=1)
+df = pd.merge(df_ereolen, df_bibliotekadresser.astype(str), how='left', on='bib_id')
+
+#manually map names. Kan bruges på alle fysiske lån!
+
+# Create a mapping dictionary for filename adjustments
+filename_map = {
+    'Aabenraa': 'Aabenraa Biblioteker og Kulturhuse',
+    'Aalborg': 'Aalborg Bibliotekerne',
+    'Aarhus': 'Aarhus Kommunes Biblioteker',
+    'Albertslund': 'Albertslund Bibliotek',
+    'Allerød': 'Allerød Biblioteker',
+    'Assens': 'AssensBibliotekerne',
+    'Ballerup': 'Ballerup Bibliotekerne',
+    'Billund': 'Billund Bibliotekerne',
+    'Bornholm': 'Bornholms Folkebiblioteker',
+    'Brøndby-Bibliotekerne': 'Brøndby-Bibliotekerne',
+    'Brønderslev': 'Brønderslev Bibliotek',
+    'Dragør': 'Dragør Bibliotek',
+    'Egedal': 'Egedal Bibliotekerne',
+    'Esbjerg': 'Esbjerg Kommunes Biblioteker',
+    'Faaborg-Midtfyn': 'Faaborg-Midtfyn Bibliotekerne',
+    'Favrskov': 'Favrskov Bibliotekerne',
+    'Faxe': 'Faxe Kommunes Biblioteker & Borgerservice',
+    'Fredensborg': 'Fredensborg Bibliotekerne',
+    'Fredericia': 'Fredericia Bibliotek',
+    'Frederiksberg': 'Biblioteket Frederiksberg',
+    'Frederikshavn': 'Bibliotek & Borgerservice Frederikshavn Kommune',
+    'Frederikssund': 'Frederikssund Bibliotekerne',
+    'Furesø': 'Furesø Bibliotek & Borgerservice',
+    'Gentofte': 'Gentofte Bibliotekerne',
+    'Gladsaxe': 'Gladsaxe Bibliotekerne',
+    'Glostrup': 'Glostrup Bibliotek',
+    'Greve': 'Greve Bibliotek',
+    'Gribskov': 'Gribskov Biblioteker',
+    'Guldborgsund': 'Guldborgsund-bibliotekerne',
+    'Haderslev': 'Haderslev Bibliotekerne',
+    'Halsnæs': 'Halsnæs Bibliotekerne',
+    'Hedensted': 'Hedensted Bibliotekerne',
+    'Helsingør': 'Helsingør Kommunes Biblioteker',
+    'Herlev': 'Herlev Bibliotek',
+    'Herning': 'Herning Bibliotekerne',
+    'Hillerød': 'Hillerød Bibliotekerne',
+    'Hjørring': 'Hjørring Bibliotekerne',
+    'Holbæk': 'Holbæk Bibliotekerne',
+    'Holstebro': 'Holstebro Bibliotek',
+    'Horsens': 'Horsens Kommunes Biblioteker',
+    'Hvidovre': 'HvidovreBibliotekerne',
+    'Høje-Taastrup': 'Høje-Taastrup Kommunes Biblioteker',
+    'Hørsholm': 'Hørsholm Bibliotek',
+    'Ikast-Brande': 'Ikast-Brande Bibliotek',
+    'Ishøj': 'Kulturium Ishøj Bibliotek',
+    'Jammerbugt': 'Jammerbugt Bibliotekerne',
+    'Kalundborg': 'Kalundborg Biblioteker',
+    'Kerteminde': 'Kerteminde Bibliotekerne',
+    'Kolding': 'Koldingbibliotekerne',
+    'København': 'Københavns Biblioteker',
+    'Køge': 'Køge Bibliotekerne',
+    'Langeland': 'Langeland Bibliotek',
+    'Lejre': 'Lejre Bibliotek & Arkiv',
+    'Lemvig': 'Lemvig Bibliotek',
+    'Lolland': 'LollandBibliotekerne',
+    'Lyngby-Taarbæk': 'Lyngby-Taarbæk Bibliotekerne',
+    'Læsø': 'Læsø Bibliotek',
+    'Mariagerfjord': 'Mariagerfjord Bibliotekerne',
+    'Middelfart': 'Middelfart Bibliotek',
+    'Morsø': 'Morsø Folkebibliotek',
+    'Norddjurs': 'Norddjurs Biblioteker',
+    'Nordfyns Kommune': 'Bibliotek og Borgerservice Nordfyns Kommune',
+    'Nyborg': 'Nyborg Bibliotek',
+    'Næstved': 'Næstved Bibliotek og Borgerservice',
+    'Odder': 'Odder Bibliotek',
+    'Odense': 'Odense Bibliotekerne',
+    'Odsherred': 'Odsherred Bibliotek og Kulturhuse',
+    'Randers': 'Randers Bibliotek',
+    'Rebild': 'Rebild Bibliotekerne',
+    'Ringkøbing-Skjern': 'Ringkøbing-Skjern Bibliotekerne',
+    'Ringsted': 'Ringsted Bibliotek & Borgerservice',
+    'Roskilde': 'Roskilde Bibliotekerne',
+    'Rudersdal': 'Rudersdal Bibliotekerne',
+    'Rødovre': 'Rødovre Bibliotek',
+    'Samsø': 'Samsø Bibliotek',
+    'Silkeborg': 'Silkeborg Bibliotekerne',
+    'Skanderborg': 'Skanderborg Bibliotek',
+    'Skive': 'Skive Bibliotek',
+    'Slagelse': 'Slagelse Biblioteker og Borgerservice',
+    'Solrød': 'Solrød Bibliotek og Kulturhus',
+    'Sorø': 'Sorø Bibliotek',
+    'Stevns': 'Stevns Bibliotekerne',
+    'Struer': 'Struer Bibliotek',
+    'Svendborg': 'Svendborg Bibliotek',
+    'Syddjurs': 'Syddjurs Bibliotek',
+    'Sønderborg': 'Biblioteket Sønderborg',
+    'Thy': 'Biblioteket i Thy',
+    'Tårnby': 'Tårnby Kommunebiblioteker',
+    'Tønder': 'Tønder Kommunes Biblioteker',
+    'Vejle': 'Vejle Bibliotekerne',
+    'Vesthimmerland': 'Vesthimmerlands Biblioteker',
+    'Varde': 'Varde Bibliotek',
+    'Vallensbæk': 'Vallensbæk Bibliotek',
+    'Vejen': 'Vejen Kommunes Biblioteker',
+    'Vejle': 'Vejle Bibliotekerne',
+    'Vesthimmerland': 'Vesthimmerlands Biblioteker',
+    'Viborg': 'Viborg Bibliotekerne',
+    'Vordingborg': 'Vordingborg Bibliotekerne',
+    'Ærø': 'Ærø Folkebibliotek'
+}
+filename_map_inverted = {v: k for k, v in filename_map.items()}
+
+# Now, use the inverted mapping dictionary to adjust the DataFrame
+df['filename'] = df['filename'].map(filename_map_inverted)
+
+#Choreopleth map for forfatter ereolen lån 2022 (difference in proportion)
+df['filename'] = df['filename'].replace({'Brønderslev': 'Brønderslev-Dronninglund', 'Thy': 'Thisted', 'Nordfyns Kommune' : 'Nordfyns', 'Brøndby-Bibliotekerne': 'Brøndby', 'Aarhus': 'Århus', 'Aarhus1': 'Århus', 'Aarhus2': 'Århus', 'Aarhus3': 'Århus', 'Københavns Biblioteker1': 'København', 'Københavns Biblioteker2': 'København', 'Københavns Biblioteker3' : 'København', 'Københavns Biblioteker4' : 'København'}) #make kommunenames correspond
+df_forfatter1 = df[df.navn == 'Thomas Korsgaard']
+df_forfatter2 = df[df.navn == 'Glenn Bech']
+df_forfatter3 = df[df.navn == 'Morten Pape']
+df_forfatter4 = df[df.navn == 'Édouard Louis']
+df_forfatter5 = df[df.navn == 'Douglas Stuart']
+df_forfatter6 = df[df.navn == 'Annie Ernaux']
+df_forfatter = pd.concat([df_forfatter1, df_forfatter2, df_forfatter3, df_forfatter4, df_forfatter5, df_forfatter6])
+
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+# Assuming you've loaded and prepared df
+df_forfatter_agg = df_forfatter.groupby('filename').size().reset_index(name='loans')
+df_agg = df.groupby('filename').size().reset_index(name='loans')
+
+# Calculate proportions
+df_forfatter_agg['proportion'] = df_forfatter_agg['loans'] / df_forfatter_agg['loans'].sum()
+df_agg['proportion'] = df_agg['loans'] / df_agg['loans'].sum()
+
+# Merge the geographic data with your loan data 
+geo_data = gpd.read_file('C:\\Users\\xgrsma\\Downloads\\municipalities.geojson')
+geo_merged = geo_data.merge(df_forfatter_agg, left_on='label_dk', right_on='filename', how='left').merge(df_agg, left_on='label_dk', right_on='filename', how='left', suffixes=('_forfatter', '_all'))
+
+# Calculate the difference in proportions
+geo_merged['proportion_diff'] = geo_merged['proportion_forfatter'] - geo_merged['proportion_all']
+
+geo_merged['Proportion of loans for forfatter in municipality'] = geo_merged ['loans_forfatter'] / geo_merged ['loans_all']
+
+
+
+# Drop rows where 'label_dk' or 'proportion_diff' contain NaN values
+cleaned_geo_merged = unique_geo_merged.dropna(subset=['label_dk', 'Difference in Proportions'])
+
+# Sort the DataFrame alphabetically by the 'label_dk' column
+sorted_geo_merged = cleaned_geo_merged.sort_values('label_dk')
+
+# Convert the sorted DataFrame to a dictionary with 'label_dk' as keys and 'proportion_diff' as values
+result_dict = sorted_geo_merged.set_index('label_dk')['Difference in Proportions'].to_dict()
+
+# Print the dictionary
+print(result_dict)
+
+# Plotting the map with differences
+fig, ax = plt.subplots(1, figsize=(20, 10))
+divider = max(abs(geo_merged['Difference in Proportions'].min()), geo_merged['Difference in Proportions'].max())
+geo_merged.plot(column='Difference in Proportions', ax=ax, legend=True, k=2,
+                cmap='bwr', legend_kwds={'label': "Difference in Proportions (Class literature - All)"},
+                vmin=-divider, vmax=divider,  # Centering color map at zero
+                missing_kwds={'color': 'grey'},
+               edgecolor='black', linewidth=0.1)
+ax.set_title("Difference in Proportions in Loans eReolen 2022-23: Class literature vs. All")
+plt.show()
